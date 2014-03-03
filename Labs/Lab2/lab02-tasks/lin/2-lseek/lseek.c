@@ -32,7 +32,7 @@ int main(void)
 	
 	pos = lseek(fd2, 100, SEEK_CUR);
 
-	//printf("pos = %d\n", pos);
+	printf("pos = %d\n", pos);
 	
 	rc = close(fd1);
 	DIE(rc < 0, "fd1");

@@ -1,0 +1,3 @@
+ * dup - redirected stderr to fd1
+ -- Press ENTER to continue ... * closed fd1
+ -- Press ENTER to continue ...
