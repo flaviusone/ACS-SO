@@ -203,15 +203,50 @@ int Hash_print_bucket(unsigned int index, char* outfile,Hashtable* hash){
 	/* Print \n and close file */
 	if(outfile == NULL){
 			printf("\n");
-		}else{
+	}else{
 			fprintf(g,"\n");
 			fclose(g);
-		}
+	}
 	return 1;
 }
 
+/** 
+ * Prints whole hashtable at STDOUT or in FILE 
+ */
 int Hash_print(char* outfile,Hashtable* hash){
-	
+
+	FILE* g;
+	Nod *nod;	
+	int i;
+
+	/* Open file for writing */
+	if(outfile != NULL){
+		g = fopen(outfile, "a");
+	}
+
+	for(i = 0 ; i < hash->size ; i++){
+		nod = hash->buckets[i];
+		/* Skip empty buckets */
+		if(nod == NULL) continue;
+		while(nod != NULL){
+			if(outfile == NULL){
+				printf("%s ",nod->cuvant);
+			}else{
+				fprintf(g,"%s ",nod->cuvant);
+			}
+			nod = nod->next;
+		}
+
+		/* Print \n and close file */
+		if(outfile == NULL){
+				printf("\n");
+		}else{
+				fprintf(g,"\n");
+		}
+	}
+	/* Close file if opened */
+	if(outfile != NULL) fclose(g);
+
 	return 1;
 }
 
