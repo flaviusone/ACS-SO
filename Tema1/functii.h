@@ -20,4 +20,22 @@ typedef struct _Hashtable{
 	Nod **buckets;
 } Hashtable;
 
-Hashtable *create_hashtable(uint32_t size);
+Hashtable *create_Hashtable(uint32_t size);
+
+int Hash_add(char* word,Hashtable* hash);
+
+int Hash_remove(char* word,Hashtable* hash);
+
+int Hash_clear(Hashtable* hash);
+
+int Hash_find(char* word,char* outfile,Hashtable* hash);
+
+int Hash_print_bucket(uint32_t index, char* outfile,Hashtable* hash);
+
+int Hash_print(char* outfile,Hashtable* hash);
+
+int Hash_resize_double(Hashtable* hash);
+
+int Hash_resize_halve(Hashtable* hash);
+
+
