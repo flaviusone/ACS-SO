@@ -41,7 +41,7 @@ void parse_command(char* buffer, Hashtable *hash){
 	}
 
 	/* Parse clear */
-	if(strcmp(token,"clear\n") == 0){
+	if(strcmp(token,"clear") == 0){
 		res = Hash_clear(hash);
 		DIE(res<0,"Error in Hash_clear");
 		return;
