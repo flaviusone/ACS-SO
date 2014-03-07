@@ -10,7 +10,6 @@
 
 
 #include <stdio.h>
-#include <stdint.h>
 #include <string.h>
 #include "debug.h"
 #include "utils.h"
@@ -23,11 +22,11 @@ void parse_command(char* buffer, Hashtable *hash){
 
 	int res;
 
-	char* token = strtok(buffer, " ");
+	char* token = strtok(buffer, " \n");
 	char* aux;
 	/* Parse add */
 	if(strcmp(token,"add") == 0){
-		token = strtok(NULL, " ");
+		token = strtok(NULL, " \n");
 		res = Hash_add(token,hash);
 		DIE(res<0,"Error in Hash_add");
 		return;
@@ -35,7 +34,7 @@ void parse_command(char* buffer, Hashtable *hash){
 
 	/* Parse remove */
 	if(strcmp(token,"remove") == 0){
-		token = strtok(NULL, " ");
+		token = strtok(NULL, " \n");
 		res = Hash_remove(token,hash);
 		DIE(res<0,"Error in Hash_remove");
 		return;
@@ -49,8 +48,8 @@ void parse_command(char* buffer, Hashtable *hash){
 	}		
 	/* Parse find */
 	if(strcmp(token,"find") == 0){
-		token = strtok(NULL, " ");
-		aux = strtok(NULL, " ");
+		token = strtok(NULL, " \n");
+		aux = strtok(NULL, " \n");
 		/* Check if file is an option */
 		if(aux != NULL){
 			res = Hash_find(token,aux,hash);
@@ -63,9 +62,9 @@ void parse_command(char* buffer, Hashtable *hash){
 	}
 	/* Parse print_bucket */
 	if(strcmp(token,"print_bucket") == 0){
-		token = strtok(NULL, " ");
-		uint32_t index = atoi(token);
-		aux = strtok(NULL, " ");
+		token = strtok(NULL, " \n");
+		unsigned int index = atoi(token);
+		aux = strtok(NULL, " \n");
 		/* Check if file is an option */
 		if(aux != NULL){
 			res = Hash_print_bucket(index,aux,hash);
@@ -78,7 +77,7 @@ void parse_command(char* buffer, Hashtable *hash){
 	}
 	/* Parse print */
 	if(strcmp(token,"print") == 0){
-		aux = strtok(NULL, " ");
+		aux = strtok(NULL, " \n");
 		res = Hash_print(aux,hash);
 		DIE(res<0,"Error in Hash_print");	
 		return;
@@ -90,7 +89,7 @@ void parse_command(char* buffer, Hashtable *hash){
 	}
 	/* Parse resize */
 	if(strcmp(token,"resize") == 0){
-		token = strtok(NULL, " ");
+		token = strtok(NULL, " \n");
 		if(strcmp(token,"double\n") == 0){
 			res = Hash_resize_double(hash);
 			DIE(res<0,"Error in Hash_resize_double");	
@@ -114,7 +113,7 @@ int main(int argc,char* argv[]){
 	DIE(argc<2,"Invalid Input");
 
 	/* Set hashtable_size */
-	uint32_t hashtable_size = atoi(argv[1]);
+	unsigned int hashtable_size = atoi(argv[1]);
 
 	/* Allocate Hashtable */
 	hash = create_Hashtable(hashtable_size);
