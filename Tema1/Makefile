@@ -8,9 +8,12 @@ Output = tema1
 
 .PHONY: all clean
 
-all: tema1
+all: tema1 run
 
-tema1: tema1.c debug.h utils.h
+tema1: tema1.c debug.h utils.h functii.h functii.c
+
+run:
+	./tema1
 
 .PHONY: clean
  
