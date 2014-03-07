@@ -79,14 +79,13 @@ void parse_command(char* buffer, Hashtable *hash){
 	/* Parse print */
 	if(strcmp(token,"print") == 0){
 		aux = strtok(NULL, " ");
-		/* Check if file is an option */
-		if(aux != NULL){
-			res = Hash_print(aux,hash);
-			DIE(res<0,"Error in Hash_print");	
-		}else{
-			res = Hash_print(NULL,hash);
-			DIE(res<0,"Error in Hash_print");	
-		}
+		res = Hash_print(aux,hash);
+		DIE(res<0,"Error in Hash_print");	
+		return;
+	}
+	if(strcmp(token,"print\n") == 0){
+		res = Hash_print(NULL,hash);
+		DIE(res<0,"Error in Hash_print");	
 		return;
 	}
 	/* Parse resize */
@@ -123,7 +122,7 @@ int main(int argc,char* argv[]){
 
 	/* Parse from STDIN */
 	if(argc <= 2){
-		
+
 		/* Read Command */
 		fgets(buff,BUFFSIZE,stdin);
 
@@ -145,6 +144,7 @@ int main(int argc,char* argv[]){
 			fgets(buff,BUFFSIZE,f);
 
 			while(!feof(f)){
+				dprintf("%s\n",buff);
 				/* Parse Command */
 				parse_command(buff,hash);
 
