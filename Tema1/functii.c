@@ -51,6 +51,7 @@ int Hash_add(char* word,Hashtable* hash){
 
 	/* Compute hash index */
 	unsigned int index = hash_function(word,hash->size);
+	dprintf("Added word has bucket index %u\n", index);
 	Nod *nod_nou,*nod;
 
 	nod_nou = malloc(sizeof(Nod));
@@ -176,17 +177,41 @@ int Hash_find(char* word,char* outfile,Hashtable* hash){
 	return 1;
 }
 
+/** 
+ * Prints index bucket at STDOUT or in FILE 
+ */
 int Hash_print_bucket(unsigned int index, char* outfile,Hashtable* hash){
 	
-	if(outfile == NULL)
-		printf("I am in function Hash_print_bucket cu index %d\n",index);
-	else
-		printf("I am in function Hash_print_bucket cu fisier cu index %d\n",index);
+	FILE* g;
+	Nod *nod;
+	nod = hash->buckets[index];
+
+	/* Open file for writing */
+	if(outfile != NULL){
+		g = fopen(outfile, "a");
+	}
+
+	while(nod != NULL){
+		if(outfile == NULL){
+			printf("%s ",nod->cuvant);
+		}else{
+			fprintf(g,"%s ",nod->cuvant);
+		}
+		nod = nod->next;
+	}
+
+	/* Print \n and close file */
+	if(outfile == NULL){
+			printf("\n");
+		}else{
+			fprintf(g,"\n");
+			fclose(g);
+		}
 	return 1;
 }
 
 int Hash_print(char* outfile,Hashtable* hash){
-	printf("I am in function Hash_print\n");
+	
 	return 1;
 }
 
