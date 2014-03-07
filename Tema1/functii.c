@@ -36,8 +36,6 @@ Hashtable *create_Hashtable(unsigned int size){
 	/* Allocated initial nodes */
 	for(i = 0 ; i < size ; i++){
 		hash->buckets[i] = NULL;
-		// hash->buckets[i]->next = NULL;
-		// hash->buckets[i]->cuvant = NULL;
 	}
 
 	hash->size = size;
@@ -84,10 +82,40 @@ int Hash_add(char* word,Hashtable* hash){
 
 	return 1;
 }
-
+/**
+ * Removes word from hashtable
+ * Returns 1 if success -1 on fail
+ */
 int Hash_remove(char* word,Hashtable* hash){
-	printf("I am in function Hash_remove\n");
-	return 1;
+	/* Compute Index */
+	unsigned int index = hash_function(word,hash->size);
+
+	Nod* nod = hash->buckets[index];
+	Nod* tmp;
+	/* Check if bucket has elements */
+	if(nod == NULL) return -1; 
+
+	/* If only 1 Word in bucket */
+	if(nod->next == NULL){
+		if(strcmp(nod->cuvant,word) == 0){
+			free(nod->cuvant);
+			nod = NULL;
+			return 1;
+		}
+	}
+	/* Search for Word to remove */
+	while(nod->next != NULL){
+		if(strcmp(nod->next->cuvant,word) == 0){
+			tmp = nod->next;
+			nod->next = nod->next->next;
+			free(tmp);
+			free(tmp->cuvant);
+			return 1;
+		}
+		nod = nod->next;
+	}
+	/* Word was not found */
+	return -1;
 }
 
 int Hash_clear(Hashtable* hash){
@@ -115,7 +143,7 @@ int Hash_find(char* word,char* outfile,Hashtable* hash){
 		nod = nod->next;
 	}
 
-	/* Print part */
+	/* Check if NO file was supplied */
 	if(outfile == NULL)
 		if(found) 
 			printf("True\n");
