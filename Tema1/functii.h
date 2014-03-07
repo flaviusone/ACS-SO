@@ -16,26 +16,26 @@ typedef struct _Nod{
 } Nod;
 
 typedef struct _Hashtable{
-	uint32_t size;
+	unsigned int size;
 	Nod **buckets;
 } Hashtable;
 
-Hashtable *create_Hashtable(uint32_t size);
+Hashtable *create_Hashtable(unsigned int size);
 
-int Hash_add(char* word,Hashtable* hash);
+int Hash_add(char* word,Hashtable* hashtable);
 
-int Hash_remove(char* word,Hashtable* hash);
+int Hash_remove(char* word,Hashtable* hashtable);
 
-int Hash_clear(Hashtable* hash);
+int Hash_clear(Hashtable* hashtable);
 
-int Hash_find(char* word,char* outfile,Hashtable* hash);
+int Hash_find(char* word,char* outfile,Hashtable* hashtable);
 
-int Hash_print_bucket(uint32_t index, char* outfile,Hashtable* hash);
+int Hash_print_bucket(unsigned int index, char* outfile,Hashtable* hashtable);
 
-int Hash_print(char* outfile,Hashtable* hash);
+int Hash_print(char* outfile,Hashtable* hashtable);
 
-int Hash_resize_double(Hashtable* hash);
+int Hash_resize_double(Hashtable* hashtable);
 
-int Hash_resize_halve(Hashtable* hash);
+int Hash_resize_halve(Hashtable* hashtable);
 
-
+unsigned int hash_function(const char *str, unsigned int hash_length);
