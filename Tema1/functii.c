@@ -117,9 +117,23 @@ int Hash_remove(char* word,Hashtable* hash){
 	/* Word was not found */
 	return -1;
 }
-
+/**
+ * Clears Hashtable
+ */
 int Hash_clear(Hashtable* hash){
-	printf("I am in function Hash_clear\n");
+	int i;
+	Nod *nod,*tmp;
+	for(i = 0; i<hash->size ; i++){
+		nod = hash->buckets[i];
+		/* Free each bucket */
+		while(nod != NULL){
+			tmp = nod;
+			nod = nod ->next;
+			tmp->next = NULL;
+			free(tmp->cuvant);
+			free(tmp);			
+		}
+	}
 	return 1;
 }
 
