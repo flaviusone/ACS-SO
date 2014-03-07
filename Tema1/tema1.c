@@ -48,53 +48,44 @@ void parse_command(char* buffer, Hashtable *hash){
 	}		
 	/* Parse find */
 	if(strcmp(token,"find") == 0){
+		/* Get Word and File */
 		token = strtok(NULL, " \n");
 		aux = strtok(NULL, " \n");
-		/* Check if file is an option */
-		if(aux != NULL){
-			res = Hash_find(token,aux,hash);
-			DIE(res<0,"Error in Hash_find");	
-		}else{
-			res = Hash_find(token,NULL,hash);
-			DIE(res<0,"Error in Hash_find");	
-		}
+	
+		res = Hash_find(token,aux,hash);
+		DIE(res<0,"Error in Hash_find");
 		return;
 	}
 	/* Parse print_bucket */
 	if(strcmp(token,"print_bucket") == 0){
+		/* Get Index and File */
 		token = strtok(NULL, " \n");
+		DIE(token == NULL, "Null token");
 		unsigned int index = atoi(token);
 		aux = strtok(NULL, " \n");
-		/* Check if file is an option */
-		if(aux != NULL){
-			res = Hash_print_bucket(index,aux,hash);
-			DIE(res<0,"Error in Hash_print_bucket");	
-		}else{
-			res = Hash_print_bucket(index,NULL,hash);
-			DIE(res<0,"Error in Hash_print_bucket");	
-		}
+
+		res = Hash_print_bucket(index,aux,hash);
+		DIE(res<0,"Error in Hash_print_bucket");	
 		return;
 	}
 	/* Parse print */
 	if(strcmp(token,"print") == 0){
+		/* Get File */
 		aux = strtok(NULL, " \n");
+
 		res = Hash_print(aux,hash);
-		DIE(res<0,"Error in Hash_print");	
+		DIE(res<0,"Error in Hash_print");				
 		return;
 	}
-	if(strcmp(token,"print\n") == 0){
-		res = Hash_print(NULL,hash);
-		DIE(res<0,"Error in Hash_print");	
-		return;
-	}
+
 	/* Parse resize */
 	if(strcmp(token,"resize") == 0){
 		token = strtok(NULL, " \n");
-		if(strcmp(token,"double\n") == 0){
+		if(strcmp(token,"double") == 0){
 			res = Hash_resize_double(hash);
 			DIE(res<0,"Error in Hash_resize_double");	
 		}
-		if(strcmp(token,"halve\n") == 0){
+		if(strcmp(token,"halve") == 0){
 			res = Hash_resize_halve(hash);
 			DIE(res<0,"Error in Hash_resize_halve");	
 		}
