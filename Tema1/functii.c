@@ -92,27 +92,25 @@ int Hash_remove(char* word,Hashtable* hash){
 	unsigned int index = hash_function(word,hash->size);
 
 	Nod* nod = hash->buckets[index];
-	Nod* tmp;
+	Nod* nod_aux = NULL;
 	/* Check if bucket has elements */
 	if(nod == NULL) return -1; 
 
-	/* If only 1 Word in bucket */
-	if(nod->next == NULL){
+	/* Search for Word to remove */
+	while(nod != NULL){
 		if(strcmp(nod->cuvant,word) == 0){
 			free(nod->cuvant);
-			nod = NULL;
+			if(nod_aux != NULL){
+				nod_aux -> next = nod->next;
+			}else{
+				/* first element */
+				hash->buckets[index] = nod->next;
+			}
+			free(nod);
+
 			return 1;
 		}
-	}
-	/* Search for Word to remove */
-	while(nod->next != NULL){
-		if(strcmp(nod->next->cuvant,word) == 0){
-			tmp = nod->next;
-			nod->next = nod->next->next;
-			free(tmp);
-			free(tmp->cuvant);
-			return 1;
-		}
+		nod_aux = nod;
 		nod = nod->next;
 	}
 	/* Word was not found */
@@ -231,6 +229,7 @@ int Hash_print(char* outfile,Hashtable* hash){
 		while(nod != NULL){
 			if(outfile == NULL){
 				printf("%s ",nod->cuvant);
+				dprintf("printing once \n");
 			}else{
 				fprintf(g,"%s ",nod->cuvant);
 			}
