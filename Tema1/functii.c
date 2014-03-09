@@ -51,8 +51,10 @@ int Hash_add(char* word,Hashtable* hash){
 
 	/* Compute hash index */
 	unsigned int index = hash_function(word,hash->size);
-	dprintf("Added word has bucket index %u\n", index);
+	dprintf("Added word %s has bucket index %u\n",word, index);
 	Nod *nod_nou,*nod;
+	/* This is the previous node */
+	Nod *nod_aux = NULL;
 
 	nod_nou = malloc(sizeof(Nod));
 	/* Check if allocate did succede */
@@ -70,16 +72,21 @@ int Hash_add(char* word,Hashtable* hash){
 	}
 	
 	/* Check for duplicates */
-	while(nod->next != NULL){
+	while(nod != NULL){
 		if(strcmp(word,nod->cuvant) == 0){
 			/* Word already exists */
 			return 2;
 		}
+		nod_aux = nod;
 		nod = nod->next;
 	}
 
 	/* Add new node to the end of list */
-	nod->next = nod_nou;
+	if(nod_aux != NULL){
+		nod_aux->next = nod_nou;
+	}else{
+		hash->buckets[index] = nod_nou;
+	}
 
 	return 1;
 }
@@ -101,7 +108,7 @@ int Hash_remove(char* word,Hashtable* hash){
 		if(strcmp(nod->cuvant,word) == 0){
 			free(nod->cuvant);
 			if(nod_aux != NULL){
-				nod_aux -> next = nod->next;
+				nod_aux->next = nod->next;
 			}else{
 				/* first element */
 				hash->buckets[index] = nod->next;
@@ -229,7 +236,6 @@ int Hash_print(char* outfile,Hashtable* hash){
 		while(nod != NULL){
 			if(outfile == NULL){
 				printf("%s ",nod->cuvant);
-				dprintf("printing once \n");
 			}else{
 				fprintf(g,"%s ",nod->cuvant);
 			}
@@ -250,12 +256,64 @@ int Hash_print(char* outfile,Hashtable* hash){
 }
 
 int Hash_resize_double(Hashtable* hash){
-	printf("I am in function Hash_resize_double\n");
+	Hashtable* new_hash;
+	Nod* nod;
+	int i,res;
+
+	/* Compute new size */
+	unsigned int new_size = hash->size * 2;
+
+	/* Allocate new hash */
+	new_hash = create_Hashtable(new_size);
+	DIE(new_hash==NULL,"Unable to allocate");
+
+	/* Iterate trough old hash and add at new hash */
+	for(i = 0 ; i < hash->size ; i++){
+		nod = hash->buckets[i];
+		while(nod != NULL){
+			res = Hash_add(nod->cuvant,new_hash);
+			DIE(res<0,"Error in Hash_add");
+			nod = nod -> next;
+		}
+	}
+	/* Free Old Hash */
+	free(hash->buckets);
+
+	/* Restore pointers*/
+	hash->size = new_hash->size;
+	hash->buckets = new_hash->buckets;
+
 	return 1;
 }
 
 int Hash_resize_halve(Hashtable* hash){
-	printf("I am in function Hash_resize_halve\n");
+	Hashtable* new_hash;
+	Nod* nod;
+	int i,res;
+
+	/* Compute new size */
+	unsigned int new_size = hash->size / 2;
+
+	/* Allocate new hash */
+	new_hash = create_Hashtable(new_size);
+	DIE(new_hash==NULL,"Unable to allocate");
+
+	/* Iterate trough old hash and add at new hash */
+	for(i = 0 ; i < hash->size ; i++){
+		nod = hash->buckets[i];
+		while(nod != NULL){
+			res = Hash_add(nod->cuvant,new_hash);
+			DIE(res<0,"Error in Hash_add");
+			nod = nod -> next;
+		}
+	}
+	/* Free Old Hash */
+	free(hash->buckets);
+
+	/* Restore pointers*/
+	hash->size = new_hash->size;
+	hash->buckets = new_hash->buckets;
+
 	return 1;
 }
 
