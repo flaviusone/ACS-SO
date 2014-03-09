@@ -19,13 +19,15 @@
 
 
 void parse_command(char* buffer, Hashtable *hash){
-
+	char* token;
+	char* aux;
 	int res;
+	unsigned int index;
 
 	if(strcmp(buffer,"\n") == 0) return;
 
-	char* token = strtok(buffer, " \n");
-	char* aux;
+	token = strtok(buffer, " \n");
+	
 	/* Parse add */
 	if(strcmp(token,"add") == 0){
 		token = strtok(NULL, " \n");
@@ -63,7 +65,7 @@ void parse_command(char* buffer, Hashtable *hash){
 		/* Get Index and File */
 		token = strtok(NULL, " \n");
 		DIE(token == NULL, "Null token");
-		unsigned int index = atoi(token);
+		index = atoi(token);
 		aux = strtok(NULL, " \n");
 
 		res = Hash_print_bucket(index,aux,hash);
@@ -103,10 +105,11 @@ int main(int argc,char* argv[]){
 
 	int i;
 	FILE *f;
+	unsigned int hashtable_size;
 	DIE(argc<2,"Invalid Input");
 
 	/* Set hashtable_size */
-	unsigned int hashtable_size = atoi(argv[1]);
+	hashtable_size = atoi(argv[1]);
 
 	/* Allocate Hashtable */
 	hash = create_Hashtable(hashtable_size);
