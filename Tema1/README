@@ -1,0 +1,42 @@
+Nume: Flavius-Costin Tirnacop
+Grupa: 331CA
+E-mail: flavius.tirnacop@cti.pub.ro
+
+Tema 1 - HashTable
+
+1. Detalii Implementare
+
+La implementarea hashtable-ului in sine s-au folosit structurile clasice cu liste
+
+Implementarea consta intr-un fisier principal ce contine functia main si functia de parsare de comenzi si un fisier cu functiile aplicate asupra hashtable-ului.
+
+In functia main se face diferentiarea intre un apel cu comenzi doar de la stdin
+si un apel din mai multe fisiere.Apoi intr-o bucla se apeleaza functia de parsare
+pentru fiecare comanda in parte.
+
+Functia de parsare are rolul de a interpreta comenzile date si de a apela functiile necesare asupra hashtable-ului.Citirea s-a realizat cu fgets iar parsarea de comenzi cu strtok.
+
+Functii Hashtable:
+	- functie hash - s-a folosit functia de hashing data in cerinta care pentru o comprimare a codului a fost introdusa in fisierul functii.c
+	- functii resize - precum a fost specificat si in enunt se construieste un nou hashtable cu dimensiunea modificate si se parcurge vechiul hashtable si se adauga elementele.
+	- functii print - s-a ales folosirea a doua functii diferite dar asemanatoare desi se putea folosi print_bucket in print, dar asta ar fi insemnat sa se deschida si sa se inchida fisierul de multe ori.Se parcurg bucketurile/bucketul cerut si se afiseaza toate nodurile fie in fisier fie la stdout
+	- functia add - se adauga elemntul la finalul bucket-ului obtinut cu functia de hashting.Daca exista deja nu se mai adauga
+	- functia remove - se cauta alementul si se scoate din bucket
+	- functia clear - sterge toate elementele din hash dar nu il dezaloca complet (lasa posibilitatea de readaugare)
+	- functia find - parcurge bucketul si cauta elmentul cerut
+
+
+
+2. Descriere continut arhiva:
+	- README
+	- tema1.c 		- contine functia main si functia de parsare
+	- functii.c 	- confine functiile apelate pe hashtable
+	- functii.h 	- contine definitiile functiilor si structurilor
+	- debug.h 		- contine macroul dprintf
+	- utils.h 		- contine macroul DIE
+	- GNUmakefile	- makefile Linux
+	- Makefile		- makefile Windows
+
+3. Debugging erori
+
+Pentru debug s-a folosit macro-ul DIE si gdb
