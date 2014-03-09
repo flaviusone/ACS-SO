@@ -39,4 +39,4 @@ Functii Hashtable:
 
 3. Debugging erori
 
-Pentru debug s-a folosit macro-ul DIE si gdb
+Pentru debug s-a folosit macro-ul DIE, dprintf si gdb
