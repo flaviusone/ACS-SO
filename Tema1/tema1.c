@@ -22,6 +22,8 @@ void parse_command(char* buffer, Hashtable *hash){
 
 	int res;
 
+	if(strcmp(buffer,"\n") == 0) return;
+
 	char* token = strtok(buffer, " \n");
 	char* aux;
 	/* Parse add */
@@ -113,15 +115,9 @@ int main(int argc,char* argv[]){
 	/* Parse from STDIN */
 	if(argc <= 2){
 
-		/* Read Command */
-		fgets(buff,BUFFSIZE,stdin);
-
-		while(!feof(stdin)){
+		while(fgets(buff,BUFFSIZE,stdin) != NULL){
 			/* Parse Command */
 			parse_command(buff,hash);
-
-			/* Read Command */
-			fgets(buff,BUFFSIZE,stdin);
 		}
 	/* Parse from FILES */
 	}else{
@@ -131,15 +127,10 @@ int main(int argc,char* argv[]){
 			DIE(f == NULL , "Unable to open File");
 
 			/* Read Command */
-			fgets(buff,BUFFSIZE,f);
-
-			while(!feof(f)){
+			while(fgets(buff,BUFFSIZE,f) != NULL){
 				dprintf("%s\n",buff);
 				/* Parse Command */
 				parse_command(buff,hash);
-
-				/* Read Command */
-				fgets(buff,BUFFSIZE,f);
 			}
 			/* Close file */
 			fclose(f);
