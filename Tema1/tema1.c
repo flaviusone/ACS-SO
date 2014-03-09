@@ -27,7 +27,7 @@ void parse_command(char* buffer, Hashtable *hash){
 	if(strcmp(buffer,"\n") == 0) return;
 
 	token = strtok(buffer, " \n");
-	
+
 	/* Parse add */
 	if(strcmp(token,"add") == 0){
 		token = strtok(NULL, " \n");
@@ -49,13 +49,13 @@ void parse_command(char* buffer, Hashtable *hash){
 		res = Hash_clear(hash);
 		DIE(res<0,"Error in Hash_clear");
 		return;
-	}		
+	}
 	/* Parse find */
 	if(strcmp(token,"find") == 0){
 		/* Get Word and File */
 		token = strtok(NULL, " \n");
 		aux = strtok(NULL, " \n");
-	
+
 		res = Hash_find(token,aux,hash);
 		DIE(res<0,"Error in Hash_find");
 		return;
@@ -69,7 +69,7 @@ void parse_command(char* buffer, Hashtable *hash){
 		aux = strtok(NULL, " \n");
 
 		res = Hash_print_bucket(index,aux,hash);
-		DIE(res<0,"Error in Hash_print_bucket");	
+		DIE(res<0,"Error in Hash_print_bucket");
 		return;
 	}
 	/* Parse print */
@@ -78,7 +78,7 @@ void parse_command(char* buffer, Hashtable *hash){
 		aux = strtok(NULL, " \n");
 
 		res = Hash_print(aux,hash);
-		DIE(res<0,"Error in Hash_print");				
+		DIE(res<0,"Error in Hash_print");
 		return;
 	}
 
@@ -87,11 +87,11 @@ void parse_command(char* buffer, Hashtable *hash){
 		token = strtok(NULL, " \n");
 		if(strcmp(token,"double") == 0){
 			res = Hash_resize_double(hash);
-			DIE(res<0,"Error in Hash_resize_double");	
+			DIE(res<0,"Error in Hash_resize_double");
 		}
 		if(strcmp(token,"halve") == 0){
 			res = Hash_resize_halve(hash);
-			DIE(res<0,"Error in Hash_resize_halve");	
+			DIE(res<0,"Error in Hash_resize_halve");
 		}
 		return;
 	}

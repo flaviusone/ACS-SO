@@ -56,8 +56,8 @@ int Hash_add(char* word,Hashtable* hash){
 	/* Compute hash index */
 	index = hash_function(word,hash->size);
 	dprintf("Added word %s has bucket index %u\n",word, index);
-	
-	
+
+
 
 	nod_nou = malloc(sizeof(Nod));
 	/* Check if allocate did succede */
@@ -66,10 +66,10 @@ int Hash_add(char* word,Hashtable* hash){
 
 	/* Add string to Node */
 	d = malloc (strlen (word) + 1);   // Space for length plus nul
-    if (d == NULL) return -1;          // No memory
-    strcpy (d,word); 
-    nod_nou->cuvant = d;
-	
+	if (d == NULL) return -1;          // No memory
+	strcpy (d,word);
+	nod_nou->cuvant = d;
+
 	/* Get Node bucket */
 	nod = hash->buckets[index];
 
@@ -78,7 +78,7 @@ int Hash_add(char* word,Hashtable* hash){
 		hash->buckets[index] = nod_nou;
 		return 1;
 	}
-	
+
 	/* Check for duplicates */
 	while(nod != NULL){
 		if(strcmp(word,nod->cuvant) == 0){
@@ -109,7 +109,7 @@ int Hash_remove(char* word,Hashtable* hash){
 	Nod* nod = hash->buckets[index];
 	Nod* nod_aux = NULL;
 	/* Check if bucket has elements */
-	if(nod == NULL) return -1; 
+	if(nod == NULL) return -1;
 
 	/* Search for Word to remove */
 	while(nod != NULL){
@@ -145,8 +145,8 @@ int Hash_clear(Hashtable* hash){
 			nod = nod ->next;
 			tmp->next = NULL;
 			free(tmp->cuvant);
-			free(tmp);		
-			tmp = NULL;	
+			free(tmp);
+			tmp = NULL;
 		}
 		hash->buckets[i] = NULL;
 	}
@@ -175,7 +175,7 @@ int Hash_find(char* word,char* outfile,Hashtable* hash){
 
 	/* Check if NO file was supplied */
 	if(outfile == NULL)
-		if(found) 
+		if(found)
 			printf("True\n");
 		else
 			printf("False\n");
@@ -183,7 +183,7 @@ int Hash_find(char* word,char* outfile,Hashtable* hash){
 		/* Open file in append mode */
 		g = fopen(outfile,"a");
 		DIE(g<0,"Error in Opening file (Hash_find)");
-		if(found) 
+		if(found)
 			fprintf(g,"True\n");
 		else
 			fprintf(g,"False\n");
@@ -192,11 +192,11 @@ int Hash_find(char* word,char* outfile,Hashtable* hash){
 	return 1;
 }
 
-/** 
- * Prints index bucket at STDOUT or in FILE 
+/**
+ * Prints index bucket at STDOUT or in FILE
  */
 int Hash_print_bucket(unsigned int index, char* outfile,Hashtable* hash){
-	
+
 	FILE* g;
 	Nod *nod;
 	nod = hash->buckets[index];
@@ -225,15 +225,15 @@ int Hash_print_bucket(unsigned int index, char* outfile,Hashtable* hash){
 	return 1;
 }
 
-/** 
- * Prints whole hashtable at STDOUT or in FILE 
+/**
+ * Prints whole hashtable at STDOUT or in FILE
  * We don't use print_bucket because that woudl mean opening and closing
  * the file too many times
  */
 int Hash_print(char* outfile,Hashtable* hash){
 
 	FILE* g;
-	Nod *nod;	
+	Nod *nod;
 	unsigned int i;
 
 	/* Open file for writing */
