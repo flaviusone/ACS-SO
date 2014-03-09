@@ -145,8 +145,10 @@ int Hash_clear(Hashtable* hash){
 			nod = nod ->next;
 			tmp->next = NULL;
 			free(tmp->cuvant);
-			free(tmp);			
+			free(tmp);		
+			tmp = NULL;	
 		}
+		hash->buckets[i] = NULL;
 	}
 	return 1;
 }
@@ -203,7 +205,7 @@ int Hash_print_bucket(unsigned int index, char* outfile,Hashtable* hash){
 	if(outfile != NULL){
 		g = fopen(outfile, "a");
 	}
-	if(nod == NULL) return;
+	if(nod == NULL) return 1;
 	while(nod != NULL){
 		if(outfile == NULL){
 			printf("%s ",nod->cuvant);
@@ -225,6 +227,8 @@ int Hash_print_bucket(unsigned int index, char* outfile,Hashtable* hash){
 
 /** 
  * Prints whole hashtable at STDOUT or in FILE 
+ * We don't use print_bucket because that woudl mean opening and closing
+ * the file too many times
  */
 int Hash_print(char* outfile,Hashtable* hash){
 
@@ -262,11 +266,15 @@ int Hash_print(char* outfile,Hashtable* hash){
 
 	return 1;
 }
-
+/**
+ * Creates a new hashtable with size doubled and adds the data from
+ * the initial hashtable
+ */
 int Hash_resize_double(Hashtable* hash){
 	Hashtable* new_hash;
 	Nod* nod;
-	int i,res;
+	unsigned int i;
+	int res;
 
 	/* Compute new size */
 	unsigned int new_size = hash->size * 2;
@@ -285,7 +293,10 @@ int Hash_resize_double(Hashtable* hash){
 		}
 	}
 	/* Free Old Hash */
+	res = Hash_clear(hash);
+	DIE(res < 0,"Error in hash_clear");
 	free(hash->buckets);
+
 
 	/* Restore pointers*/
 	hash->size = new_hash->size;
@@ -294,6 +305,10 @@ int Hash_resize_double(Hashtable* hash){
 	return 1;
 }
 
+/**
+ * Creates a new hashtable with size halved and adds the data from
+ * the initial hashtable
+ */
 int Hash_resize_halve(Hashtable* hash){
 	Hashtable* new_hash;
 	Nod* nod;
@@ -316,6 +331,8 @@ int Hash_resize_halve(Hashtable* hash){
 		}
 	}
 	/* Free Old Hash */
+	res = Hash_clear(hash);
+	DIE(res < 0,"Error in hash_clear");
 	free(hash->buckets);
 
 	/* Restore pointers*/

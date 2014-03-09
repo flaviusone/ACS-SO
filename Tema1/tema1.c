@@ -103,7 +103,7 @@ char buff[BUFFSIZE];
 
 int main(int argc,char* argv[]){
 
-	int i;
+	int i,res;
 	FILE *f;
 	unsigned int hashtable_size;
 	DIE(argc<2,"Invalid Input");
@@ -139,5 +139,12 @@ int main(int argc,char* argv[]){
 			fclose(f);
 		}
 	}
+
+	/* Free all memory */
+	res = Hash_clear(hash);
+	DIE(res < 0, "Error in hash_clear");
+	free(hash->buckets);
+	free(hash);
+
 	return 0;
 }
