@@ -185,7 +185,7 @@ static void do_redirect(int filedes, const char *filename,int type)
 
 	close(fd);
 }
-
+/* Frees command memory */
 static void free_cmd(char **command){
 	// free command
 	int i = 0;
@@ -195,6 +195,7 @@ static void free_cmd(char **command){
 	}
 	free(command);
 }
+/* Sets an Enviroment variable */
 static void set_env(char *cmd_verb){
 	int r;
 	/* Set env */

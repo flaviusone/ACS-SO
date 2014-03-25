@@ -1,0 +1,45 @@
+/**
+ * Author: Tirnacop Flavius
+ * Grupa: 331CA
+ * Operating Sytems 2013 - Assignment 2
+ */
+
+ 1. Implementare:
+
+ Am folosit scheletul dat pentru a implementa functionalitatea temei.Pe langa
+ completarea functiilor date in schelet am mai adaugat si functionalitati precum
+ macroul DIE sau functia de debug dprintf.
+
+ 2. Functii aditionale:
+
+ - free_cmd - elibereaza memoria unei comenzi
+ - set_env - functie folosita pentru setarea variabilelor de mediu
+
+ 3. Detalii implementare functii: voi detalia doar cateva functii mai complicate
+
+ 	- do_on_pipe - procesul parinte creaza un copil prin fork care la randul lui
+ 	creeaza un copil prin fork.Primul copil de asemenea creeaza si un pipe.Cei 
+ 	coi copii comunica intre ei iar parintele asteapta sa se termine executia.S-a
+ 	folosit aceasta abordare pentru a nu afecta file descriptorii procesului parinte
+ 	principal.
+
+ 	- do_in_parallel - procesul parinte face fork iar fiecare din aceste 2 procese
+ 	parinte + copil executa comanda data
+
+ 	- parse simple - 
+ 		- se verifica daca se apeleaza exit/quit
+ 		- se verifica daca se apeleaza cd
+ 		- se verifica daca se apeleaza variabila de mediu
+ 		- altfel este sigur o comanda externa
+ 			- se fac redirectarile necesare
+ 			- se apeleaza comanda
+
+
+ 4. Continut arhiva:
+ 	- fisiere parser
+ 	- main.c
+ 	- utils.h
+ 	- utils-lin.c
+ 	- debug.h
+ 	- Makefile
+ 	- README

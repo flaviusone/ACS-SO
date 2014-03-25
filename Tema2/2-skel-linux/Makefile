@@ -1,13 +1,11 @@
 CC=gcc
-CFLAGS=-g -Wall -DDEBUG
+# CFLAGS=-g -Wall -DDEBUG
+CFLAGS=-g -Wall
 OBJ_PARSER=parser.tab.o parser.yy.o
 OBJ=main.o utils-lin.o
 TARGET=mini-shell
 
-all: clean build run
-
-run:
-	./$(TARGET)
+all: clean build
 
 build: $(TARGET)
 
