@@ -1,4 +1,8 @@
 /**
+ * Author: Tirnacop Flavius
+ * Grupa: 331CA
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
  * Operating Sytems 2013 - Assignment 2
  *
  */
@@ -34,19 +38,19 @@ static bool shell_cd(word_t *dir)
 	char *params = get_word(dir);
 
 	if (params != NULL)
-        status = chdir(params);
-    else{
-    	/* Cd to home if no parameters asigned */
-    	params = getenv("HOME");
-    	if(params == NULL){
-    		free(params);
-    		return EXIT_FAILURE;
-    	}else{
-    		status = chdir(params);
-    		free(params);
-    		DIE(status < 0, "Error: shell_cd");
-    	}
-    }
+		status = chdir(params);
+	else{
+		/* Cd to home if no parameters asigned */
+		params = getenv("HOME");
+		if(params == NULL){
+			free(params);
+			return EXIT_FAILURE;
+		}else{
+			status = chdir(params);
+			free(params);
+			DIE(status < 0, "Error: shell_cd");
+		}
+	}
 	return status;
 }
 
@@ -55,8 +59,6 @@ static bool shell_cd(word_t *dir)
  */
 static int shell_exit()
 {
-	/* TODO execute exit/quit */
-
 	return SHELL_EXIT;
 }
 
@@ -185,13 +187,13 @@ static void do_redirect(int filedes, const char *filename,int type)
 }
 
 static void free_cmd(char **command){
-    // free command
-    int i = 0;
-    while(command[i] != NULL){
-    	free(command[i]);
-    	i++;
-    }
-   	free(command);
+	// free command
+	int i = 0;
+	while(command[i] != NULL){
+		free(command[i]);
+		i++;
+	}
+	free(command);
 }
 static void set_env(char *cmd_verb){
 	int r;
@@ -244,53 +246,53 @@ static int parse_simple(simple_command_t *s, int level, command_t *father)
 	}
 
 	/* External command */
-    int type_flag;
-    pid = fork();
+	int type_flag;
+	pid = fork();
 	switch (pid) {
-    case -1:
-        DIE(pid == -1, "Error: fork");
-    case 0:
+	case -1:
+		DIE(pid == -1, "Error: fork");
+	case 0:
 
-    	/* Flag for output type append/normal etc*/
-    	type_flag = s->io_flags;
-    	if(type_flag == 1) type_flag = 2;
+		/* Flag for output type append/normal etc*/
+		type_flag = s->io_flags;
+		if(type_flag == 1) type_flag = 2;
 
-    	/* STDOUT redirect with optional STDERR */
-    	if(s->out != NULL){
-    		do_redirect(STDOUT_FILENO, get_word(s->out), type_flag);
-    		if(s->err != NULL){
-    			if(strcmp(get_word(s->out),get_word(s->err)) == 0)
-    				dup2(STDOUT_FILENO, STDERR_FILENO);
-    			else
-    				do_redirect(STDERR_FILENO, get_word(s->err), 2);
-    		}
-    	}else
-    	/* STDERR redirect */
-    	if(s->err != NULL)
-    		do_redirect(STDERR_FILENO, get_word(s->err), type_flag);
+		/* STDOUT redirect with optional STDERR */
+		if(s->out != NULL){
+			do_redirect(STDOUT_FILENO, get_word(s->out), type_flag);
+			if(s->err != NULL){
+				if(strcmp(get_word(s->out),get_word(s->err)) == 0)
+					dup2(STDOUT_FILENO, STDERR_FILENO);
+				else
+					do_redirect(STDERR_FILENO, get_word(s->err), 2);
+			}
+		}else
+		/* STDERR redirect */
+		if(s->err != NULL)
+			do_redirect(STDERR_FILENO, get_word(s->err), type_flag);
 
-    	/* STDIN redirect */
-    	if(s->in != NULL)
-    		do_redirect(STDIN_FILENO, get_word(s->in), 1);
+		/* STDIN redirect */
+		if(s->in != NULL)
+			do_redirect(STDIN_FILENO, get_word(s->in), 1);
 
-        execvp(command[0], (char *const *) command);
-        fprintf(stderr, "Execution failed for '%s'\n", command[0]);
-        fflush(stdout);
+		execvp(command[0], (char *const *) command);
+		fprintf(stderr, "Execution failed for '%s'\n", command[0]);
+		fflush(stdout);
 		free_cmd(command);
-        exit(EXIT_FAILURE);
-        break;
-    default:
-        free_cmd(command);
-        free(cmd_verb);
-        // asteapta procesul copil sa termine
-        wait_ret = waitpid(pid, &status, 0);
-        DIE(wait_ret < 0, "Error: waitpid");
-        if (WIFEXITED(status)) {
-            return WEXITSTATUS(status);
-        } else
-            return EXIT_FAILURE;
-        break;
-    }
+		exit(EXIT_FAILURE);
+		break;
+	default:
+		free_cmd(command);
+		free(cmd_verb);
+		// asteapta procesul copil sa termine
+		wait_ret = waitpid(pid, &status, 0);
+		DIE(wait_ret < 0, "Error: waitpid");
+		if (WIFEXITED(status)) {
+			return WEXITSTATUS(status);
+		} else
+			return EXIT_FAILURE;
+		break;
+	}
 	return EXIT_SUCCESS; /* TODO replace with actual exit status */
 }
 
@@ -310,20 +312,19 @@ static bool do_in_parallel(command_t *cmd1, command_t *cmd2, int level, command_
 			/* Run first command */
 			r = parse_command(cmd1, level, father);
 			DIE(r==-1,"Error do in paralel");
-			exit(EXIT_SUCCESS);
+			return EXIT_SUCCESS;
 		default:
 			/* Run second command */
 			r = parse_command(cmd2, level, father);
 			DIE(r==-1,"Error do in paralel");
-	        break;
+			break;
 	}
-    wait_ret = waitpid(pid, &status, 0);
-    DIE(wait_ret < 0, "Error: waitpid");
-    if (WIFEXITED(status)) {
-        return WEXITSTATUS(status);
-    } else
-        return EXIT_FAILURE;
-	return EXIT_SUCCESS;
+	wait_ret = waitpid(pid, &status, 0);
+	DIE(wait_ret < 0, "Error: waitpid");
+	if (WIFEXITED(status)) {
+		return WEXITSTATUS(status);
+	} else
+		return EXIT_FAILURE;
 }
 
 /**
@@ -338,59 +339,59 @@ static bool do_on_pipe(command_t *cmd1, command_t *cmd2, int level, command_t *f
 	pid_main = fork();
 	switch (pid_main){
 		case -1:
-            DIE(pid_main == -1, "Error: fork");
-        case 0:
-        	r = pipe(fd);
+			DIE(pid_main == -1, "Error: fork");
+		case 0:
+			r = pipe(fd);
 			DIE(r < 0, "Error pipe create");
 			pid_aux = fork();
 			switch(pid_aux){
 				case -1:
-            		DIE(pid_aux == -1, "Error: fork");
-            	case 0:
-    	        	/* Child process reads from parent */
-		        	/* Close write head */
-		        	r = close(fd[1]);
-		        	DIE(r < 0, "Error close");
-		        	/* Redirect */
-		        	r = dup2(fd[0], STDIN_FILENO);
-		        	DIE(r < 0, "Error dup2");
-		        	r = close(fd[0]);
-		        	DIE(r < 0, "Error close");
-		        	r = parse_command(cmd2, level + 1, father);
-		        	exit(r);
-		       	default:
-		       	    // procesul parinte scrie in pipe
-		            // inchide capul de citire al pipe-ului
-		            r = close(fd[0]);
-		            DIE(r < 0, "Error: close");
-		            // redirectare outpul
-		            r = dup2(fd[1], STDOUT_FILENO);
-		            DIE(r < 0, "Error: dup2");
-		            // inchide file descriptorul
-		            r = close(fd[1]);
-		            DIE(r < 0, "Error: close");
-		            // executa comanda
-		            r = parse_command(cmd1, level + 1, father);
-		            // trimite EOF copilului
-		            r = close(STDOUT_FILENO);
-		            DIE(r < 0, "Error: close");
+					DIE(pid_aux == -1, "Error: fork");
+				case 0:
+					/* Child process reads from parent */
+					/* Close write head */
+					r = close(fd[1]);
+					DIE(r < 0, "Error close");
+					/* Redirect */
+					r = dup2(fd[0], STDIN_FILENO);
+					DIE(r < 0, "Error dup2");
+					r = close(fd[0]);
+					DIE(r < 0, "Error close");
+					r = parse_command(cmd2, level + 1, father);
+					exit(r);
+				default:
+					// procesul parinte scrie in pipe
+					// inchide capul de citire al pipe-ului
+					r = close(fd[0]);
+					DIE(r < 0, "Error: close");
+					// redirectare outpul
+					r = dup2(fd[1], STDOUT_FILENO);
+					DIE(r < 0, "Error: dup2");
+					// inchide file descriptorul
+					r = close(fd[1]);
+					DIE(r < 0, "Error: close");
+					// executa comanda
+					r = parse_command(cmd1, level + 1, father);
+					// trimite EOF copilului
+					r = close(STDOUT_FILENO);
+					DIE(r < 0, "Error: close");
 
-		            // dprintf("After wait\n");
-		            wait_ret = waitpid(pid_aux, &status, 0);
-		            DIE(wait_ret < 0, "Error: waitpid");
-		            if (WIFEXITED(status)) {
-		        		exit(WEXITSTATUS(status));
-		    		} else
-		        		exit(EXIT_FAILURE);
+					// dprintf("After wait\n");
+					wait_ret = waitpid(pid_aux, &status, 0);
+					DIE(wait_ret < 0, "Error: waitpid");
+					if (WIFEXITED(status)) {
+						exit(WEXITSTATUS(status));
+					} else
+						exit(EXIT_FAILURE);
 			}
 		default:
-            // asteapta procesul cu pidul pid
-            wait_ret = waitpid(pid_main, &status, 0);
-		    DIE(wait_ret < 0, "Error: waitpid");
-		    if (WIFEXITED(status)) {
-		        return WEXITSTATUS(status);
-		    } else
-		        return EXIT_FAILURE;
+			// asteapta procesul cu pidul pid
+			wait_ret = waitpid(pid_main, &status, 0);
+			DIE(wait_ret < 0, "Error: waitpid");
+			if (WIFEXITED(status)) {
+				return WEXITSTATUS(status);
+			} else
+				return EXIT_FAILURE;
 	}
 }
 

@@ -1,4 +1,8 @@
 /**
+ * Author: Tirnacop Flavius
+ * Grupa: 331CA
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
  * Operating Sytems 2013 - Assignment 2
  *
  */
