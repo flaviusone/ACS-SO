@@ -39,7 +39,7 @@ static int shell_exit()
 {
 	/* TODO execute exit/quit */
 
-	return 0; /* TODO replace with actual exit code */
+	return SHELL_EXIT;
 }
 
 /**

@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -Wall
+CFLAGS=-g -Wall -DDEBUG
 OBJ_PARSER=parser.tab.o parser.yy.o
 OBJ=main.o utils-lin.o
 TARGET=mini-shell
