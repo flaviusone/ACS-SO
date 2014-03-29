@@ -17,6 +17,7 @@
 #include <unistd.h>
 
 #include "utils.h"
+#include "debug.h"
 
 #define READ		0
 #define WRITE		1
@@ -231,6 +232,7 @@ int parse_command(command_t *c, int level, command_t *father)
  */
 char *read_line()
 {
+	dprintf("Reading lin\n");
 	char *instr;
 	char *chunk;
 	char *ret;
