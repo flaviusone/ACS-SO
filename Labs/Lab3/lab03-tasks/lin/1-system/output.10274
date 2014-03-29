@@ -1,0 +1,3 @@
+execve("./my_system", ["./my_system", "ls"], [/* 32 vars */]) = 0
+clone(child_stack=0, flags=CLONE_PARENT_SETTID|SIGCHLD, parent_tidptr=0x7ffff83f0308) = 10275
+--- SIGCHLD (Child exited) @ 0 (0) ---

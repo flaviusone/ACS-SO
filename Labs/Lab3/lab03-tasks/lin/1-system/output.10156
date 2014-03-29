@@ -1,0 +1,1 @@
+execve("/bin/ls", ["ls"], [/* 32 vars */]) = 0

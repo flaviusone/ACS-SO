@@ -1,0 +1,3 @@
+execve("/bin/sh", ["sh", "-c", "ls"], [/* 32 vars */]) = 0
+clone(child_stack=0, flags=CLONE_CHILD_CLEARTID|CLONE_CHILD_SETTID|SIGCHLD, child_tidptr=0x7f95203019d0) = 10276
+--- SIGCHLD (Child exited) @ 0 (0) ---
