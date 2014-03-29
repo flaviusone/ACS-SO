@@ -145,7 +145,14 @@ static char **get_argv(simple_command_t *command, int *size)
  */
 static int parse_simple(simple_command_t *s, int level, command_t *father)
 {
-	/* TODO sanity checks */
+	/* Init aux variables */
+	int pid,wait_ret,status,size,i;
+	/* Init command string list*/
+	char **command = get_argv(s,&size);
+
+	/* sanity checks */
+	DIE(s == NULL,"Parse_simple: NULL command");
+	DIE(s->up != father,"Parse_command: Invalid father");
 
 	/* TODO if builtin command, execute the command */
 
@@ -159,8 +166,45 @@ static int parse_simple(simple_command_t *s, int level, command_t *father)
          *   2. wait for child
          *   3. return exit status
 	 */
+    pid = fork();
+	switch (pid) {
+    case -1:
+        DIE(pid == -1, "Error: fork");
+    case 0:
 
-	return 0; /* TODO replace with actual exit status */
+        execvp(command[0], (char *const *) command);
+        fprintf(stderr, "Execution failed for '%s'\n", command[0]);
+
+        // free command
+        i = 0;
+        while(command[i] != NULL){
+        	free(command[i]);
+        	i++;
+        }
+       	free(command);
+
+        exit(EXIT_FAILURE);
+        break;
+    default:
+        // free command
+        i = 0;
+        while(command[i] != NULL){
+        	free(command[i]);
+        	i++;
+        }
+       	free(command);
+
+        // asteapta procesul copil sa termine
+        wait_ret = waitpid(pid, &status, 0);
+        DIE(wait_ret < 0, "Error: waitpid");
+        if (WIFEXITED(status)) {
+            return WEXITSTATUS(status);
+        } else
+            return EXIT_FAILURE;
+        break;
+    }
+
+	return EXIT_SUCCESS; /* TODO replace with actual exit status */
 }
 
 /**
@@ -188,12 +232,16 @@ static bool do_on_pipe(command_t *cmd1, command_t *cmd2, int level, command_t *f
  */
 int parse_command(command_t *c, int level, command_t *father)
 {
-	/* TODO sanity checks */
+	/* sanity checks */
+	int r=0;
+	DIE(c == NULL,"Parse_command: NULL command");
+	DIE(c->up != father,"Parse_command: Invalid father");
 
 	if (c->op == OP_NONE) {
-		/* TODO execute a simple command */
+		/* execute a simple command */
+		r = parse_simple(c->scmd, level + 1, c);
 
-		return 0; /* TODO replace with actual exit code of command */
+		return r;
 	}
 
 	switch (c->op) {
@@ -232,7 +280,6 @@ int parse_command(command_t *c, int level, command_t *father)
  */
 char *read_line()
 {
-	dprintf("Reading lin\n");
 	char *instr;
 	char *chunk;
 	char *ret;
