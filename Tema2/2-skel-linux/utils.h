@@ -24,8 +24,6 @@
 		}							\
 	} while(0)
 
-#endif
-
 
 /**
  * Readline from mini-shell.
