@@ -310,20 +310,19 @@ static bool do_in_parallel(command_t *cmd1, command_t *cmd2, int level, command_
 			/* Run first command */
 			r = parse_command(cmd1, level, father);
 			DIE(r==-1,"Error do in paralel");
-			break;
+			exit(EXIT_SUCCESS);
 		default:
 			/* Run second command */
 			r = parse_command(cmd2, level, father);
 			DIE(r==-1,"Error do in paralel");
-	        wait_ret = waitpid(pid, &status, 0);
-	        DIE(wait_ret < 0, "Error: waitpid");
-	        if (WIFEXITED(status)) {
-	            return WEXITSTATUS(status);
-	        } else
-	            return EXIT_FAILURE;
 	        break;
 	}
-
+    wait_ret = waitpid(pid, &status, 0);
+    DIE(wait_ret < 0, "Error: waitpid");
+    if (WIFEXITED(status)) {
+        return WEXITSTATUS(status);
+    } else
+        return EXIT_FAILURE;
 	return EXIT_SUCCESS;
 }
 
@@ -332,9 +331,67 @@ static bool do_in_parallel(command_t *cmd1, command_t *cmd2, int level, command_
  */
 static bool do_on_pipe(command_t *cmd1, command_t *cmd2, int level, command_t *father)
 {
-	/* TODO redirect the output of cmd1 to the input of cmd2 */
+	/* Redirect the output of cmd1 to the input of cmd2 */
 
-	return true; /* TODO replace with actual exit status */
+	int fd[2],pid_main,pid_aux,r,status,wait_ret;
+
+	pid_main = fork();
+	switch (pid_main){
+		case -1:
+            DIE(pid_main == -1, "Error: fork");
+        case 0:
+        	r = pipe(fd);
+			DIE(r < 0, "Error pipe create");
+			pid_aux = fork();
+			switch(pid_aux){
+				case -1:
+            		DIE(pid_aux == -1, "Error: fork");
+            	case 0:
+    	        	/* Child process reads from parent */
+		        	/* Close write head */
+		        	r = close(fd[1]);
+		        	DIE(r < 0, "Error close");
+		        	/* Redirect */
+		        	r = dup2(fd[0], STDIN_FILENO);
+		        	DIE(r < 0, "Error dup2");
+		        	r = close(fd[0]);
+		        	DIE(r < 0, "Error close");
+		        	r = parse_command(cmd2, level + 1, father);
+		        	exit(r);
+		       	default:
+		       	    // procesul parinte scrie in pipe
+		            // inchide capul de citire al pipe-ului
+		            r = close(fd[0]);
+		            DIE(r < 0, "Error: close");
+		            // redirectare outpul
+		            r = dup2(fd[1], STDOUT_FILENO);
+		            DIE(r < 0, "Error: dup2");
+		            // inchide file descriptorul
+		            r = close(fd[1]);
+		            DIE(r < 0, "Error: close");
+		            // executa comanda
+		            r = parse_command(cmd1, level + 1, father);
+		            // trimite EOF copilului
+		            r = close(STDOUT_FILENO);
+		            DIE(r < 0, "Error: close");
+
+		            // dprintf("After wait\n");
+		            wait_ret = waitpid(pid_aux, &status, 0);
+		            DIE(wait_ret < 0, "Error: waitpid");
+		            if (WIFEXITED(status)) {
+		        		exit(WEXITSTATUS(status));
+		    		} else
+		        		exit(EXIT_FAILURE);
+			}
+		default:
+            // asteapta procesul cu pidul pid
+            wait_ret = waitpid(pid_main, &status, 0);
+		    DIE(wait_ret < 0, "Error: waitpid");
+		    if (WIFEXITED(status)) {
+		        return WEXITSTATUS(status);
+		    } else
+		        return EXIT_FAILURE;
+	}
 }
 
 /**
