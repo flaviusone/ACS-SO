@@ -139,6 +139,26 @@ static char **get_argv(simple_command_t *command, int *size)
 	return argv;
 }
 
+/*
+ * @filedes  - file descriptor to be redirected
+ * @filename - filename used for redirection
+ * from lab 3 SO 2014
+ */
+static void do_redirect(int filedes, const char *filename)
+{
+	int rc;
+	int fd;
+
+	/* TODO 3 - Redirect filedes into fd representing filename */
+	fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	DIE(fd < 0, "open");
+
+	rc = dup2(fd, filedes);
+	DIE(rc < 0, "dup2");
+
+	close(fd);
+}
+
 /**
  * Parse a simple command (internal, environment variable assignment,
  * external command).
@@ -146,7 +166,7 @@ static char **get_argv(simple_command_t *command, int *size)
 static int parse_simple(simple_command_t *s, int level, command_t *father)
 {
 	/* Init aux variables */
-	int pid,wait_ret,status,size,i;
+	int pid,wait_ret,status,size,i,r;
 	/* Init command string list*/
 	char **command = get_argv(s,&size);
 
@@ -155,6 +175,14 @@ static int parse_simple(simple_command_t *s, int level, command_t *father)
 	DIE(s->up != father,"Parse_command: Invalid father");
 
 	/* TODO if builtin command, execute the command */
+
+	/* Check exit/quit */
+	if((strcmp(get_word(s->verb),"exit") == 0) ||
+		(strcmp(get_word(s->verb),"quit") == 0)){
+		r = shell_exit();
+		DIE(r != SHELL_EXIT,"Error: shell_exit");
+		return r;
+	}
 
 	/* TODO if variable assignment, execute the assignment and return
          * the exit status */
@@ -172,8 +200,13 @@ static int parse_simple(simple_command_t *s, int level, command_t *father)
         DIE(pid == -1, "Error: fork");
     case 0:
 
+    	if(s->out != NULL){
+    		do_redirect(STDOUT_FILENO, get_word(s->out));
+    	}
+
         execvp(command[0], (char *const *) command);
         fprintf(stderr, "Execution failed for '%s'\n", command[0]);
+        fflush(stdout);
 
         // free command
         i = 0;
