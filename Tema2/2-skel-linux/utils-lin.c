@@ -22,14 +22,31 @@
 #define READ		0
 #define WRITE		1
 
+static char *get_word(word_t *s);
+
 /**
  * Internal change-directory command.
  */
 static bool shell_cd(word_t *dir)
 {
+	int status;
 	/* TODO execute cd */
+	char *params = get_word(dir);
 
-	return 0;
+	if (params != NULL)
+        status = chdir(params);
+    else{
+    	params = getenv("HOME");
+    	if(params == NULL){
+    		free(params);
+    		return EXIT_FAILURE;
+    	}else{
+    		status = chdir(params);
+    		free(params);
+    		DIE(status < 0, "Error: shell_cd");
+    	}
+    }
+	return EXIT_SUCCESS;
 }
 
 /**
@@ -144,7 +161,7 @@ static char **get_argv(simple_command_t *command, int *size)
  * @filename - filename used for redirection
  * from lab 3 SO 2014
  */
-static void do_redirect(int filedes, const char *filename)
+static void do_redirect(int filedes, const char *filename,int type)
 {
 	int rc;
 	int fd;
@@ -159,6 +176,16 @@ static void do_redirect(int filedes, const char *filename)
 	close(fd);
 }
 
+static void free_cmd(char **command){
+    // free command
+    int i = 0;
+    while(command[i] != NULL){
+    	free(command[i]);
+    	i++;
+    }
+   	free(command);
+}
+
 /**
  * Parse a simple command (internal, environment variable assignment,
  * external command).
@@ -169,19 +196,25 @@ static int parse_simple(simple_command_t *s, int level, command_t *father)
 	int pid,wait_ret,status,size,i,r;
 	/* Init command string list*/
 	char **command = get_argv(s,&size);
+	char *cmd_verb = get_word(s->verb);
 
 	/* sanity checks */
 	DIE(s == NULL,"Parse_simple: NULL command");
 	DIE(s->up != father,"Parse_command: Invalid father");
 
-	/* TODO if builtin command, execute the command */
-
 	/* Check exit/quit */
-	if((strcmp(get_word(s->verb),"exit") == 0) ||
-		(strcmp(get_word(s->verb),"quit") == 0)){
+	if((strcmp(cmd_verb,"exit") == 0) || (strcmp(cmd_verb,"quit") == 0)){
 		r = shell_exit();
+		free_cmd(command);
+		free(cmd_verb);
 		DIE(r != SHELL_EXIT,"Error: shell_exit");
 		return r;
+	/* Check CD */
+	}else if(strcmp(cmd_verb, "cd") == 0){
+		status = shell_cd(s->params);
+        free_cmd(command);
+        free(cmd_verb);
+        return status;
 	}
 
 	/* TODO if variable assignment, execute the assignment and return
@@ -201,32 +234,17 @@ static int parse_simple(simple_command_t *s, int level, command_t *father)
     case 0:
 
     	if(s->out != NULL){
-    		do_redirect(STDOUT_FILENO, get_word(s->out));
+    		do_redirect(STDOUT_FILENO, get_word(s->out), 0);
     	}
 
         execvp(command[0], (char *const *) command);
         fprintf(stderr, "Execution failed for '%s'\n", command[0]);
         fflush(stdout);
-
-        // free command
-        i = 0;
-        while(command[i] != NULL){
-        	free(command[i]);
-        	i++;
-        }
-       	free(command);
-
+		free_cmd(command);
         exit(EXIT_FAILURE);
         break;
     default:
-        // free command
-        i = 0;
-        while(command[i] != NULL){
-        	free(command[i]);
-        	i++;
-        }
-       	free(command);
-
+        free_cmd(command);
         // asteapta procesul copil sa termine
         wait_ret = waitpid(pid, &status, 0);
         DIE(wait_ret < 0, "Error: waitpid");
