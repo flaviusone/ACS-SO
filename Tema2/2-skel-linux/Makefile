@@ -4,6 +4,11 @@ OBJ_PARSER=parser.tab.o parser.yy.o
 OBJ=main.o utils-lin.o
 TARGET=mini-shell
 
+all: clean build run
+
+run:
+	./$(TARGET)
+
 build: $(TARGET)
 
 $(TARGET): $(OBJ) $(OBJ_PARSER)
