@@ -250,8 +250,13 @@ static int parse_simple(simple_command_t *s, int level, command_t *father)
     	/* STDOUT redirect with optional STDERR */
     	if(s->out != NULL){
     		do_redirect(STDOUT_FILENO, get_word(s->out), type_flag);
-    		if(s->err != NULL)
-    			do_redirect(STDERR_FILENO, get_word(s->out), 2);
+    		if(s->err != NULL){
+    			if(strcmp(get_word(s->out),get_word(s->err)) == 0)
+    				dup2(STDOUT_FILENO, STDERR_FILENO);
+    			else
+    				do_redirect(STDERR_FILENO, get_word(s->err), 2);
+
+    		}
     	}else
     	/* STDERR redirect */
     	if(s->err != NULL)
@@ -291,8 +296,31 @@ static int parse_simple(simple_command_t *s, int level, command_t *father)
 static bool do_in_parallel(command_t *cmd1, command_t *cmd2, int level, command_t *father)
 {
 	/* TODO execute cmd1 and cmd2 simultaneously */
+	int pid, status, wait_ret, r;
 
-	return true; /* TODO replace with actual exit status */
+	pid = fork();
+	switch(pid){
+		case -1:
+			DIE(pid == -1, "Error: fork");
+		case 0:
+			/* Run first command */
+			r = parse_command(cmd1, level, father);
+			DIE(r==-1,"Error do in paralel");
+			break;
+		default:
+			/* Run second command */
+			r = parse_command(cmd2, level, father);
+			DIE(r==-1,"Error do in paralel");
+	        wait_ret = waitpid(pid, &status, 0);
+	        DIE(wait_ret < 0, "Error: waitpid");
+	        if (WIFEXITED(status)) {
+	            return WEXITSTATUS(status);
+	        } else
+	            return EXIT_FAILURE;
+	        break;
+	}
+
+	return EXIT_SUCCESS;
 }
 
 /**
