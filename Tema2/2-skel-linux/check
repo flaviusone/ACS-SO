@@ -1,5 +1,6 @@
 #!/bin/bash
 
+rm ../tema2-checker-lin/mini-shell
 cp mini-shell ../tema2-checker-lin/mini-shell
 cd ../tema2-checker-lin
 ./run_all.sh
