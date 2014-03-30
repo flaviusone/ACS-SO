@@ -34,7 +34,8 @@ static bool shell_cd(word_t *dir)
 	char *params = get_word(dir);
 
 	if (params != NULL)
-        status = chdir(params);
+        // status = chdir(params);
+        status = chdir(dir->string);
     else{
     	params = getenv("HOME");
     	if(params == NULL){
@@ -46,7 +47,7 @@ static bool shell_cd(word_t *dir)
     		DIE(status < 0, "Error: shell_cd");
     	}
     }
-	return EXIT_SUCCESS;
+	return status;
 }
 
 /**
@@ -167,7 +168,14 @@ static void do_redirect(int filedes, const char *filename,int type)
 	int fd;
 
 	/* TODO 3 - Redirect filedes into fd representing filename */
-	fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if(type == 0)
+		fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else if (type == 1)
+		fd = open(filename, O_RDONLY, 0644);
+	else
+		fd = open(filename, O_CREAT | O_APPEND | O_WRONLY, 0644);
+
+	// dprintf("Filedes %d Filname %s Type %d \n",filedes,filename,type);
 	DIE(fd < 0, "open");
 
 	rc = dup2(fd, filedes);
@@ -213,9 +221,9 @@ static int parse_simple(simple_command_t *s, int level, command_t *father)
 	/* Check CD */
 	}else if(strcmp(cmd_verb, "cd") == 0){
 		status = shell_cd(s->params);
-        free_cmd(command);
-        free(cmd_verb);
-        return status;
+        // free_cmd(command);
+        // free(cmd_verb);
+        // return status;
 	}
 
 	/* TODO if variable assignment, execute the assignment and return
@@ -228,15 +236,33 @@ static int parse_simple(simple_command_t *s, int level, command_t *father)
          *   2. wait for child
          *   3. return exit status
 	 */
+    int type_flag;
     pid = fork();
 	switch (pid) {
     case -1:
         DIE(pid == -1, "Error: fork");
     case 0:
 
+    	/* Flag for output type append/normal etc*/
+    	type_flag = s->io_flags;
+    	if(type_flag == 1) type_flag = 2;
+
+    	/* STDOUT redirect with optional STDERR */
     	if(s->out != NULL){
-    		do_redirect(STDOUT_FILENO, get_word(s->out), 0);
-    	}
+    		do_redirect(STDOUT_FILENO, get_word(s->out), type_flag);
+    		if(s->err != NULL)
+    			do_redirect(STDERR_FILENO, get_word(s->out), 2);
+    	}else
+    	/* STDERR redirect */
+    	if(s->err != NULL)
+    		do_redirect(STDERR_FILENO, get_word(s->err), type_flag);
+
+    	/* STDIN redirect */
+    	if(s->in != NULL)
+    		do_redirect(STDIN_FILENO, get_word(s->in), 1);
+
+
+
 
         execvp(command[0], (char *const *) command);
         fprintf(stderr, "Execution failed for '%s'\n", command[0]);
