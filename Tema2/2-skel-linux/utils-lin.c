@@ -193,7 +193,7 @@ static void free_cmd(char **command){
 static int parse_simple(simple_command_t *s, int level, command_t *father)
 {
 	/* Init aux variables */
-	int pid,wait_ret,status,size,i,r;
+	int pid,wait_ret,status,size,r;
 	/* Init command string list*/
 	char **command = get_argv(s,&size);
 	char *cmd_verb = get_word(s->verb);
@@ -209,6 +209,7 @@ static int parse_simple(simple_command_t *s, int level, command_t *father)
 		free(cmd_verb);
 		DIE(r != SHELL_EXIT,"Error: shell_exit");
 		return r;
+
 	/* Check CD */
 	}else if(strcmp(cmd_verb, "cd") == 0){
 		status = shell_cd(s->params);
@@ -284,7 +285,7 @@ static bool do_on_pipe(command_t *cmd1, command_t *cmd2, int level, command_t *f
 int parse_command(command_t *c, int level, command_t *father)
 {
 	/* sanity checks */
-	int r=0;
+	int r=1;
 	DIE(c == NULL,"Parse_command: NULL command");
 	DIE(c->up != father,"Parse_command: Invalid father");
 
@@ -297,33 +298,39 @@ int parse_command(command_t *c, int level, command_t *father)
 
 	switch (c->op) {
 	case OP_SEQUENTIAL:
-		/* TODO execute the commands one after the other */
+		parse_command(c->cmd1, level + 1, c);
+		r = parse_command(c->cmd2, level + 1, c);
 		break;
 
 	case OP_PARALLEL:
-		/* TODO execute the commands simultaneously */
+		/* execute the commands simultaneously */
+		r = do_in_parallel(c->cmd1, c->cmd2, level + 1, c);
 		break;
 
 	case OP_CONDITIONAL_NZERO:
-		/* TODO execute the second command only if the first one
-                 * returns non zero */
+		/* execute the second command only if the first one returns NON zero */
+		r = parse_command(c->cmd1, level + 1, c);
+		if(r != 0)
+			r = parse_command(c->cmd2, level + 1, c);
 		break;
 
 	case OP_CONDITIONAL_ZERO:
-		/* TODO execute the second command only if the first one
-                 * returns zero */
+		/* execute the second command only if the first one returns zero */
+		r = parse_command(c->cmd1, level + 1, c);
+		if(r == 0)
+			r = parse_command(c->cmd2, level + 1, c);
 		break;
 
 	case OP_PIPE:
-		/* TODO redirect the output of the first command to the
-		 * input of the second */
+		/* redirect the output of the first command to the input of the second */
+		r = do_on_pipe(c->cmd1, c->cmd2, level + 1, c);
 		break;
 
 	default:
 		assert(false);
 	}
 
-	return 0; /* TODO replace with actual exit code of command */
+	return r;
 }
 
 /**
